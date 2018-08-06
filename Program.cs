@@ -5,6 +5,8 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace pmessenger
 {
@@ -43,6 +45,10 @@ namespace pmessenger
             Socket socket = null;
             try
             {
+                Socket socketClient = (Socket)result.AsyncState;
+                Client client = new Client(socketClient, "test", "test");
+                Clients.Add(client);
+
                 socket = serverSocket.EndAccept(result);
                 socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
                 serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
@@ -52,10 +58,22 @@ namespace pmessenger
             }
         }
 
+        static public List<Client> Clients = new List<Client>();
+
         const int MAX_RECEIVE_ATTEMPT = 10;
         static int receiveAttempt = 0;
         private static void ReceiveCallback(IAsyncResult result)
         {
+
+            foreach(Client client in Clients)
+            {
+                if (client.ClientSocket.Connected)
+                {
+                    string msg = "Hola tengo tu socket";
+                    client.ClientSocket.Send(Encoding.ASCII.GetBytes(msg));
+                }
+            }
+
             Socket socket = null;
             try
             {
@@ -71,9 +89,8 @@ namespace pmessenger
 
                         //Message retrieval part
                         //Suppose you only want to declare that you receive data from a client to that client
-                        string msg = "I receive your BALALAL message on: " + DateTime.Now;
-                        socket.Send(Encoding.ASCII.GetBytes(msg)); //Note that you actually send data in byte[]
-                        Console.WriteLine("I sent this message to the client: " + msg);
+                        string msg = "Received: " + DateTime.Now;
+                        socket.Send(Encoding.ASCII.GetBytes(msg));
 
                         receiveAttempt = 0; //reset receive attempt
                         socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket); //repeat beginReceive
@@ -100,8 +117,11 @@ namespace pmessenger
 
         private static void RegisterClient()
         {
+            spinner.Start();
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             LoopConnect(3, 3);
+            spinner.Stop();
+            Console.WriteLine("Connected");
             string result = "";
             do
             {
@@ -402,6 +422,7 @@ namespace pmessenger
         {
             active = false;
             Draw(']');
+            Draw('\n');
         }
 
         private void Spin()
