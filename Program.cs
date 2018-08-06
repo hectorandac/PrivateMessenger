@@ -40,7 +40,7 @@ namespace pmessenger
 
         private const int BUFFER_SIZE = 8192;
         private static byte[] buffer = new byte[BUFFER_SIZE];
-        private static void AcceptCallback(IAsyncResult result)
+        public static void AcceptCallback(IAsyncResult result)
         {
             Socket socket = null;
             try
@@ -48,6 +48,11 @@ namespace pmessenger
                 Socket socketClient = (Socket)result.AsyncState;
                 Client client = new Client(socketClient, "test", "test");
                 Clients.Add(client);
+
+                foreach (Client client2 in Clients)
+                {
+                    Console.WriteLine(client2.SessionId);
+                }
 
                 socket = serverSocket.EndAccept(result);
                 socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
@@ -62,7 +67,7 @@ namespace pmessenger
 
         const int MAX_RECEIVE_ATTEMPT = 10;
         static int receiveAttempt = 0;
-        private static void ReceiveCallback(IAsyncResult result)
+        public static void ReceiveCallback(IAsyncResult result)
         {
 
             foreach(Client client in Clients)
