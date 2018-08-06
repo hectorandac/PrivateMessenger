@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.Extensions.CommandLineUtils;
+using System.Threading;
 
 namespace pmessenger
 {
@@ -16,60 +17,46 @@ namespace pmessenger
             app.ExtendedHelpText = "This console application allow the users to comunicate in a secue manner."
                 + Environment.NewLine + "It allows multiple platforms such as linux, windows and MacOS to comunicate";
 
-            // Set the arguments to display the description and help text
+            // Shows the hep text
             app.HelpOption("-?|-h|--help");
 
-            // This is a helper/shortcut method to display version info - it is creating a regular Option, with some defaults.
-            // The default help text is "Show version Information"
+            // Shows the program version.
             app.VersionOption("-v|--version", () => {
                 return string.Format("Version {0}", Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
             });
 
-            // The first argument is the option template.
-            // It starts with a pipe-delimited list of option flags/names to use
-            // Optionally, It is then followed by a space and a short description of the value to specify.
-            // e.g. here we could also just use "-o|--option"
-            var basicOption = app.Option("-o|--option <optionvalue>",
-                    "Some option value",
-                    CommandOptionType.SingleValue);
+            // OPTIONS
+            var startServer = app.Option("-s|--server",
+                "Initiates or stop the server", CommandOptionType.NoValue);
 
-            // Arguments are basic arguments, that are parsed in the order they are given
-            // e.g ConsoleArgs "first value" "second value"
-            // This is OK for really simple tasks, but generally you're better off using Options
-            // since they avoid confusion
-            var argOne = app.Argument("argOne", "App argument one");
-            var argTwo = app.Argument("argTwo", "App argument two");
+            // ADD ARGUMENT
+            //var argOne = app.Argument("argOne", "App argument one");
+            //var argTwo = app.Argument("argTwo", "App argument two");
 
-            // When no commands are specified, this block will execute.
-            // This is the main "command"
+            // EXECUTION
             app.OnExecute(() =>
             {
-                Console.WriteLine("Argument value one: {0}", argOne.Value ?? "null");
-                Console.WriteLine("Argument value two: {0}", argTwo.Value ?? "null");
 
-                //You can also use the Arguments collection to iterate through the supplied arguments
-                foreach (CommandArgument arg in app.Arguments)
+                if (startServer.HasValue())
                 {
-                    Console.WriteLine("Arguments collection value: {0}", arg.Value ?? "null");
-                }
+                    Console.WriteLine("Starting server");
+                    var spinner = new Spinner(10, 10);
 
-                // Use the HasValue() method to check if the option was specified
-                if (basicOption.HasValue())
-                {
-                    Console.WriteLine("Option was selected, value: {0}", basicOption.Value());
+                    spinner.Start();
+                    
+                    Thread.Sleep(10000);
+
+                    spinner.Stop();
                 }
-                else
-                {
-                    Console.WriteLine("No options specified.");
-                    // ShowHint() will display: "Specify --help for a list of available options and commands."
-                    app.ShowHint();
+                else {
+                    Console.WriteLine("Dont");
                 }
 
                 return 0;
             });
 
-            // This is a command with no arguments - it just does default action.
-            app.Command("simple-command", (command) =>
+            // COMMANDS EXAMPLES
+            /*app.Command("simple-command", (command) =>
             {
                 //description and help text of the command.
                 command.Description = "This is the description for simple-command.";
@@ -156,19 +143,15 @@ namespace pmessenger
                     Console.WriteLine("complex-command has finished.");
                     return 0; // return 0 on a successful execution
                 });
-            });
+            });*/
 
             try
             {
-                // This begins the actual execution of the application
                 Console.WriteLine("PMessenger executing...");
                 app.Execute(args);
             }
             catch (CommandParsingException ex)
             {
-                // You'll always want to catch this exception, otherwise it will generate a messy and confusing error for the end user.
-                // the message will usually be something like:
-                // "Unrecognized command or argument '<invalid-command>'"
                 Console.WriteLine(ex.Message);
             }
             catch (Exception ex)
@@ -176,6 +159,63 @@ namespace pmessenger
                 Console.WriteLine("Unable to execute application: {0}", ex.Message);
             }
 
+        }
+    }
+
+    public class Spinner : IDisposable
+    {
+        private const string Sequence = @"#";
+        private int counter = 0;
+        private readonly int left;
+        private readonly int top;
+        private readonly int delay;
+        private bool active;
+        private readonly Thread thread;
+
+        public Spinner(int left, int top, int delay = 100)
+        {
+            this.left = left;
+            this.top = top;
+            this.delay = delay;
+            thread = new Thread(Spin);
+        }
+
+        public void Start()
+        {
+            Draw('[');
+            active = true;
+            if (!thread.IsAlive)
+                thread.Start();
+        }
+
+        public void Stop()
+        {
+            active = false;
+            Draw(']');
+        }
+
+        private void Spin()
+        {
+            while (active)
+            {
+                Turn();
+                Thread.Sleep(delay);
+            }
+        }
+
+        private void Draw(char c)
+        {
+            Console.Write(c);
+        }
+
+        private void Turn()
+        {
+            Draw(Sequence[++counter % Sequence.Length]);
+        }
+
+        public void Dispose()
+        {
+            Stop();
         }
     }
 }

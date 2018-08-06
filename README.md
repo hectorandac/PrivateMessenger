@@ -11,10 +11,10 @@ pmessenger [OPTION]
 ## Description
 Allow comunication between clients in a secure manner.
 
-  -s, 
+  s, 
   Initiates the server in the current machine.
   
-  -c, [CLIENTID]
+  c, [CLIENTID]
   Register the current machine as a client.
   
   -p, [PASSWORDGEN]
