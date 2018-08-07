@@ -7,6 +7,9 @@ using System.Net;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace pmessenger
 {
@@ -16,6 +19,22 @@ namespace pmessenger
         static int PORT = 10094;
         static string SERVER_IP = "127.0.0.1";
         static Socket serverSocket;
+        private const int BUFFER_SIZE = 8192;
+        private static byte[] buffer = new byte[BUFFER_SIZE];
+        private static Dictionary<string, Client> Clients = new Dictionary<string, Client>();
+        const int MAX_RECEIVE_ATTEMPT = 10;
+        static int receiveAttempt = 0;
+        static Socket clientSocket;
+
+        public static string ListToString(Dictionary<string, Client> list)
+        {
+            string text = "";
+            foreach( KeyValuePair<string, Client> client in list )
+            {
+                text += client.Key + Environment.NewLine;
+            };
+            return text;
+        }
 
         private static void StartServer()
         {
@@ -26,7 +45,7 @@ namespace pmessenger
             serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
             spinner.Stop();
 
-            Console.WriteLine("\nServer ip: {0}", SERVER_IP);
+            Console.WriteLine("Server ip: {0}", SERVER_IP);
             Console.WriteLine("Server port: {0}", PORT);
             Console.WriteLine("SERVER STARTED | Displaying log...");
 
@@ -38,22 +57,11 @@ namespace pmessenger
 
         }
 
-        private const int BUFFER_SIZE = 8192;
-        private static byte[] buffer = new byte[BUFFER_SIZE];
         public static void AcceptCallback(IAsyncResult result)
         {
             Socket socket = null;
             try
             {
-                Socket socketClient = (Socket)result.AsyncState;
-                Client client = new Client(socketClient, "test", "test");
-                Clients.Add(client);
-
-                foreach (Client client2 in Clients)
-                {
-                    Console.WriteLine(client2.SessionId);
-                }
-
                 socket = serverSocket.EndAccept(result);
                 socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
                 serverSocket.BeginAccept(new AsyncCallback(AcceptCallback), null);
@@ -63,22 +71,13 @@ namespace pmessenger
             }
         }
 
-        static public List<Client> Clients = new List<Client>();
+        public static Client FindRecipient(string recipientId)
+        {
+            return Clients[recipientId];
+        }
 
-        const int MAX_RECEIVE_ATTEMPT = 10;
-        static int receiveAttempt = 0;
         public static void ReceiveCallback(IAsyncResult result)
         {
-
-            foreach(Client client in Clients)
-            {
-                if (client.ClientSocket.Connected)
-                {
-                    string msg = "Hola tengo tu socket";
-                    client.ClientSocket.Send(Encoding.ASCII.GetBytes(msg));
-                }
-            }
-
             Socket socket = null;
             try
             {
@@ -90,15 +89,37 @@ namespace pmessenger
                     {
                         byte[] data = new byte[received];
                         Buffer.BlockCopy(buffer, 0, data, 0, data.Length);
-                        Console.WriteLine(Encoding.UTF8.GetString(data)); //Here I just print it, but you need to do something else                     
 
-                        //Message retrieval part
-                        //Suppose you only want to declare that you receive data from a client to that client
-                        string msg = "Received: " + DateTime.Now;
-                        socket.Send(Encoding.ASCII.GetBytes(msg));
+                        JsonSerializer serializer = new JsonSerializer();
+                        JObject reader = (JObject)JsonConvert.DeserializeObject(Encoding.UTF8.GetString(data));
+                        Request request = (Request)serializer.Deserialize(new JTokenReader(reader), typeof(Request));
+                        string target = request.request;
 
+                        switch (target)
+                        {
+                            case "GET-USERS":
+                                socket.Send(Encoding.ASCII.GetBytes(ListToString(Clients)));
+                                break;
+                            case "REGISTE-USER":
+                                Client client = new Client(socket, request.userId, request.publicKey);
+                                Clients.Add(request.userId, client);
+                                Console.WriteLine("User with id: {0} | REGISTERED | on => " + DateTime.Now, request.userId);
+                                break;
+                            case "MESSAGE-USER":
+                                Console.WriteLine("Sending message from: {0}  ##|##  to: {1}", request.userId, request.recipientId);
+                                Client recipient = FindRecipient(request.recipientId);
+                                Socket recipientSocket = recipient.ClientSocket;
+                                recipientSocket.Send(Encoding.ASCII.GetBytes(request.userId + ": " + request.message));
+                                break;
+                            default:
+                                //Message retrieval part
+                                //Suppose you only want to declare that you receive data from a client to that client
+                                string msg = "Received: " + DateTime.Now;
+                                socket.Send(Encoding.ASCII.GetBytes(msg));
+                                break;
+                        }
                         receiveAttempt = 0; //reset receive attempt
-                        socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket); //repeat beginReceive
+                        socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), socket);
                     }
                     else if (receiveAttempt < MAX_RECEIVE_ATTEMPT)
                     { //fail but not exceeding max attempt, repeats
@@ -112,21 +133,81 @@ namespace pmessenger
                     }
                 }
             }
+            catch (System.Net.Sockets.SocketException e)
+            {
+                Console.WriteLine("Disconnected Socket");
+            }
             catch (Exception e)
             { // this exception will happen when "this" is be disposed...
                 Console.WriteLine("receiveCallback fails with exception! " + e.ToString());
             }
         }
 
-        static Socket clientSocket;
+        public static List<string> recipientsIds = new List<string>();
 
-        private static void RegisterClient()
+        private static String PrintRecipients(List<string> res)
+        {
+            string text = "Recipient list";
+            foreach(string r in res)
+            {
+                text += r + Environment.NewLine;
+            }
+            return text;
+        }
+
+        private static void RegisterClient(string userId, string publicKey)
         {
             spinner.Start();
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             LoopConnect(3, 3);
+            string request = ("{" +
+                        "'request': 'REGISTE-USER'," +
+                        "'userId': '" + userId + "'," +
+                        "'publicKey': '" + publicKey + "'}");
+            byte[] bytes = Encoding.ASCII.GetBytes(request);
+            clientSocket.Send(bytes);
             spinner.Stop();
             Console.WriteLine("Connected");
+
+            string result = "";
+            do
+            {
+                result = Console.ReadLine();
+                if (result.Contains("-r"))
+                {
+                    string[] recipients = result.Replace("-r", "").Trim().Split(',');
+                    foreach (string res in recipients)
+                    {
+                        if (!recipientsIds.Contains(res))
+                            recipientsIds.Add(res);
+                    }
+                    PrintRecipients(recipientsIds);
+                }
+                else if (result.ToLower().Trim() != "exit")
+                {
+                    foreach (string res in recipientsIds)
+                    {
+                        string message = "{" +
+                            "'request': 'MESSAGE-USER'," +
+                            "'userId': '" + userId + "'," +
+                            "'message': '" + result + "'," +
+                            "'recipientId': '" + res + "'" +
+                            "}";
+                        byte[] bytesToSend = Encoding.ASCII.GetBytes(message);
+                        clientSocket.Send(bytesToSend);
+                    }
+                }
+            } while (result.ToLower().Trim() != "exit");
+        }
+
+        private static void GetPeers()
+        {
+            spinner.Start();
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            LoopConnect(3, 3);
+            clientSocket.Send(Encoding.ASCII.GetBytes("{'request': 'GET-USERS'}"));
+            spinner.Stop();
+
             string result = "";
             do
             {
@@ -203,7 +284,9 @@ namespace pmessenger
                         //DO ANYTHING THAT YOU WANT WITH data, IT IS THE RECEIVED PACKET!
                         //Notice that your data is not string! It is actually byte[]
                         //For now I will just print it out
-                        Console.WriteLine("Server: " + Encoding.UTF8.GetString(data));
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(Encoding.UTF8.GetString(data));
+                        Console.ResetColor();
                         socket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallbackClient), socket);
                     }
                     else if (receiveAttemptClient < MAX_RECEIVE_ATTEMPT)
@@ -252,11 +335,15 @@ namespace pmessenger
             var startServer = app.Option("-s|--server",
                 "Initiates or stop the server", CommandOptionType.NoValue);
             var registerClient = app.Option("-c|--client",
-                "Registers the client application", CommandOptionType.NoValue);
+                "Registers the client application", CommandOptionType.MultipleValue);
+            var getClients = app.Option("-lc|--listclients",
+                "List all connected clients", CommandOptionType.NoValue);
             var port = app.Option("-p|--port",
                 "Set server listening port", CommandOptionType.SingleValue);
             var ip = app.Option("-i|--ip",
                 "Set server listening ip address", CommandOptionType.SingleValue);
+            var addRecipients = app.Option("-r|--recipient",
+                "Add a recipient for the conversation", CommandOptionType.MultipleValue);
 
             // ADD ARGUMENT
             //var argOne = app.Argument("argOne", "App argument one");
@@ -265,6 +352,19 @@ namespace pmessenger
             // EXECUTION
             app.OnExecute(() =>
             {
+                if (addRecipients.HasValue())
+                {
+                    foreach(string res in addRecipients.Values)
+                    {
+                        recipientsIds.Add(res);
+                        Console.WriteLine(res);
+                    }
+                }
+
+                if (getClients.HasValue())
+                {
+                    GetPeers();
+                }
 
                 if (port.HasValue())
                 {
@@ -285,7 +385,7 @@ namespace pmessenger
                 if (registerClient.HasValue())
                 {
                     Console.WriteLine("Registering client");
-                    RegisterClient();
+                    RegisterClient(registerClient.Values[0], registerClient.Values[1]);
                 }
 
 
@@ -394,6 +494,24 @@ namespace pmessenger
             {
                 Console.WriteLine("Unable to execute application: {0}", ex.Message);
             }
+        }
+    }
+
+    public class Request
+    {
+        public string request;
+        public string userId = "";
+        public string publicKey = "";
+        public string message = "";
+        public string recipientId = "";
+
+        public Request(string request, string userId = "", string publicKey = "", string message = "", string recipientId = "")
+        {
+            this.request = request;
+            this.userId = userId;
+            this.publicKey = publicKey;
+            this.message = message;
+            this.recipientId = recipientId;
         }
     }
 
