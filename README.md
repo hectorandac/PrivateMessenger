@@ -28,6 +28,9 @@ Allow comunication between clients in a secure manner.
 
   -p, [PORT]
   Sets the server listening port.
+  
+  -h | ? | --help,
+  Gives you the documentation of the given command
 
 ## AUTHORS
 Written by Héctor Acosta, Raul Ovalle and Tomas González.
