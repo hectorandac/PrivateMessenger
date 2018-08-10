@@ -1,0 +1,13 @@
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\libhostpolicy.dylib
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\libhostfxr.dylib
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.deps.json
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.runtimeconfig.json
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.runtimeconfig.dev.json
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.dll
+C:\Users\hecto\source\repos\pmessenger\pmessenger\bin\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.pdb
+C:\Users\hecto\source\repos\pmessenger\pmessenger\obj\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.csproj.CoreCompileInputs.cache
+C:\Users\hecto\source\repos\pmessenger\pmessenger\obj\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.AssemblyInfoInputs.cache
+C:\Users\hecto\source\repos\pmessenger\pmessenger\obj\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.AssemblyInfo.cs
+C:\Users\hecto\source\repos\pmessenger\pmessenger\obj\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.dll
+C:\Users\hecto\source\repos\pmessenger\pmessenger\obj\Release\netcoreapp2.0\osx.10.12-x64\pmessenger.pdb
