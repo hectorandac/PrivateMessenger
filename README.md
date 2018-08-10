@@ -39,4 +39,4 @@ Allow comunication between clients in a secure manner.
   Sets the server listening port.
 
 ## AUTHORS
-Written by Héctor Acosta and Tomas González.
+Written by Héctor Acosta, Raul Ovalle and Tomas González.
