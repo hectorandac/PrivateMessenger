@@ -11,23 +11,14 @@ pmessenger [OPTION]
 ## Description
 Allow comunication between clients in a secure manner.
 
-  -s, 
+  server, 
   Initiates the server in the current machine.
 
   -lc,
   List clients connected.
   
-  -c, [CLIENTID]
+  -u, [CLIENTID]
   Register the current machine as a client.
-  
-  -psw, [PASSWORDGEN]
-  Generates a private and public to secure the current session, if no password is provided a random one will be generated for the current session.
-  
-  -m, [MESSEGE]
-  The messege to send.
-  
-  -a,
-  Send to all recipients.
   
   -r, [CLIENTID]
   Sets the recipient to the given client ID.
