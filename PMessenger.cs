@@ -41,8 +41,6 @@ namespace pmessenger
 
                 var user = command.Option("-u|--user",
                     "Sets the client userId", CommandOptionType.SingleValue);
-                var pk = command.Option("-pk|--publicKey",
-                    "Sets the user public key for secure comunication", CommandOptionType.SingleValue);
                 var getClients = command.Option("-lc|--listClients",
                     "List all connected clients", CommandOptionType.NoValue);
                 var addRecipients = command.Option("-r|--recipient",
@@ -60,7 +58,7 @@ namespace pmessenger
 
                 command.OnExecute(() =>
                 {
-                    Client client = new Client(null, user.Value(), pk.Value());
+                    Client client = new Client(null, user.Value());
 
                     if (addRecipients.HasValue())
                     {
@@ -87,7 +85,7 @@ namespace pmessenger
                     }
                     else
                     {
-                        client.RegisterClient(client.SessionId, client.PublicKey);
+                        client.RegisterClient(client.SessionId);
                     }
                     return 0;
                 });

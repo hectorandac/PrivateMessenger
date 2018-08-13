@@ -89,7 +89,7 @@ namespace pmessenger
                                 socket.Send(Encoding.ASCII.GetBytes(ListToString(Clients)));
                                 break;
                             case "REGISTE-USER":
-                                Client client = new Client(socket, request.userId, request.publicKey);
+                                Client client = new Client(socket, request.userId);
                                 Clients.Add(request.userId, client);
                                 Console.WriteLine("User with id: {0} | REGISTERED | on => " + DateTime.Now, request.userId);
                                 break;

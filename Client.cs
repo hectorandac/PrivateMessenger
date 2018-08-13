@@ -10,13 +10,11 @@ namespace pmessenger
     {
         
         public string SessionId { get; set; }
-        public string PublicKey { get; set; }
 
-        public Client(Socket s, string id, string pk)
+        public Client(Socket s, string id)
         {
             this.socket = s;
             this.SessionId = id;
-            this.PublicKey = pk;
         }
 
         public List<string> recipientsIds = new List<string>();
@@ -31,15 +29,14 @@ namespace pmessenger
             return text;
         }
 
-        public void RegisterClient(string userId, string publicKey)
+        public void RegisterClient(string userId)
         {
             spinner.Start();
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             LoopConnect(3, 3);
             string request = ("{" +
                         "'request': 'REGISTE-USER'," +
-                        "'userId': '" + userId + "'," +
-                        "'publicKey': '" + publicKey + "'}");
+                        "'userId': '" + userId + "'}");
             byte[] bytes = Encoding.ASCII.GetBytes(request);
             socket.Send(bytes);
             spinner.Stop();
