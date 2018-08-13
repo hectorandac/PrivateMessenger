@@ -10,13 +10,15 @@ Developing team:
 The protocol that uses this application for comunication is based an an asymetric structure. The clients requests have to contain the following atributes for the server to understand it:
 
 ### CLIENT REQUEST
-request: {\n
-  "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory\n
-  "userId": String identifying the user,  <= Optional\n
-  "publicKey": Public Key for encription,  <= Optional\n
-  "message": Message to send,  <= Optional\n
-  "recipietnId": Identifier for the recipient  <= Optional\n
+```
+request: {
+  "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory
+  "userId": String identifying the user,  <= Optional
+  "publicKey": Public Key for encription,  <= Optional
+  "message": Message to send,  <= Optional
+  "recipietnId": Identifier for the recipient  <= Optional
 }
+```
 
 ### SERVER RESPONSE TO USER
 response: String of the information required by user  <= Optional
