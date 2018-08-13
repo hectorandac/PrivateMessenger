@@ -51,9 +51,9 @@ Allow comunication between clients in a secure manner.
 
 ## How to install
 All the releases are located in the following files, select your own depending on yout system:
-* [Linux] (https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/linux-x64/publish)
-* [Mac OS 10.12] (https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/osx.10.12-x64/publish)
-* [Windows 10] (https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/win10-x64/publish)
+* [Linux](https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/linux-x64/publish)
+* [Mac OS 10.12](https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/osx.10.12-x64/publish)
+* [Windows 10](https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/win10-x64/publish)
 
 Run the commands by cd in that directory and executing the command ```pmessenger``` or ```pmessenger.exe``` on windows.
 
