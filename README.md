@@ -14,7 +14,6 @@ The protocol that uses this application for comunication is based an an asymetri
 request: {
   "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory
   "userId": String identifying the user,  <= Optional
-  "publicKey": Public Key for encription,  <= Optional
   "message": Message to send,  <= Optional
   "recipietnId": Identifier for the recipient  <= Optional
 }
@@ -50,7 +49,15 @@ Allow comunication between clients in a secure manner.
   -h | ? | --help,
   Gives you the documentation of the given command
 
-## How 
+## How to use
+This section explains how to use the software, we will use a windows system as example on how to type the commands.
+
+### Initiate the server
+Use the command
+```
+pmessenger.exe server
+```
+This command will start the server in the default ip (127.0.0.1) and port (10094). You can customize these properties appending the options -i and -p respectively to modify them.
 
 ## AUTHORS
 Written by Héctor Acosta, Raul Ovalle and Tomas González.
