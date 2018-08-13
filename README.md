@@ -55,7 +55,7 @@ All the releases are located in the following files, select your own depending o
 * [Mac OS 10.12](https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/osx.10.12-x64/publish)
 * [Windows 10](https://github.com/hectorandac/PrivateMessenger/tree/master/bin/Release/netcoreapp2.0/win10-x64/publish)
 
-Run the commands by cd in that directory and executing the command ```pmessenger``` or ```pmessenger.exe``` on windows.
+Run the commands in your platform directory ```cd <Your platform directory>``` and executing the command ```pmessenger``` or ```pmessenger.exe``` on windows, Go to how to use for more details on how to use the commands.
 
 ## How to use
 This section explains how to use the software, we will use a windows system as example on how to type the commands.
