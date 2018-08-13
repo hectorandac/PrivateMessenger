@@ -44,6 +44,7 @@ namespace pmessenger
 
         }
 
+        //Handles the incoming requests
         public void AcceptCallback(IAsyncResult result)
         {
             Socket socketAccepted = null;
@@ -64,6 +65,7 @@ namespace pmessenger
             return Clients[recipientId];
         }
 
+        //Receives the requests and decides what to do with them
         public void ReceiveCallback(IAsyncResult result)
         {
             Socket socket = null;

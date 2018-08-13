@@ -10,12 +10,12 @@ Developing team:
 The protocol that uses this application for comunication is based an an asymetric structure. The clients requests have to contain the following atributes for the server to understand it:
 
 ### CLIENT REQUEST
-request: {
-  "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory
-  "userId": String identifying the user,  <= Optional
-  "publicKey": Public Key for encription,  <= Optional
-  "message": Message to send,  <= Optional
-  "recipietnId": Identifier for the recipient  <= Optional
+request: {\n
+  "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory\n
+  "userId": String identifying the user,  <= Optional\n
+  "publicKey": Public Key for encription,  <= Optional\n
+  "message": Message to send,  <= Optional\n
+  "recipietnId": Identifier for the recipient  <= Optional\n
 }
 
 ### SERVER RESPONSE TO USER
@@ -26,6 +26,9 @@ Allow comunication between clients in a secure manner.
 
   server, 
   Initiates the server in the current machine.
+
+  client,
+  Initiates a client comunication.
 
   -lc,
   List clients connected.
@@ -44,6 +47,8 @@ Allow comunication between clients in a secure manner.
   
   -h | ? | --help,
   Gives you the documentation of the given command
+
+## How 
 
 ## AUTHORS
 Written by Héctor Acosta, Raul Ovalle and Tomas González.
