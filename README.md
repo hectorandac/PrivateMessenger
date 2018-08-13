@@ -3,10 +3,23 @@ C# PrivateMessenger
 
 Developing team:
 * Héctor Acosta 1065948
-* Tomas González 1065894 
+* Tomas González 1065894
+* Raul Ovalle 
 
 ## Comunication protocol
-pmessenger [OPTION]
+The protocol that uses this application for comunication is based an an asymetric structure. The clients requests have to contain the following atributes for the server to understand it:
+
+### CLIENT REQUEST
+request: {
+  "requestType": "GET-USERS" | "REGISTER-USER" | "MESSAGE-USER",  <= Obligatory
+  "userId": String identifying the user,  <= Optional
+  "publicKey": Public Key for encription,  <= Optional
+  "message": Message to send,  <= Optional
+  "recipietnId": Identifier for the recipient  <= Optional
+}
+
+### SERVER RESPONSE TO USER
+response: String of the information required by user  <= Optional
 
 ## Description
 Allow comunication between clients in a secure manner.
