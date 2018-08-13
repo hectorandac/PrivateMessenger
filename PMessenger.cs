@@ -30,7 +30,7 @@ namespace pmessenger
             app.Name = "PMessenger";
             app.Description = "Securely comunicate with others.";
 
-            app.ExtendedHelpText = "This console application allow the users to comunicate in a secue manner."
+            app.ExtendedHelpText = "This console application allow the users to comunicate in a secure way."
                 + Environment.NewLine + "It allows multiple platforms such as linux, windows and MacOS to comunicate";
 
             // Shows the hep text
